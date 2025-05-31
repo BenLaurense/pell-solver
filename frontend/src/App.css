@@ -1,0 +1,154 @@
+/* Container */
+.calculator-container {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px 25px;
+}
+
+/* Header */
+h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #222;
+}
+
+.description-box {
+  text-align: left;
+  font-size: 13px;
+  color: #444;
+  padding: 10px 0;
+  margin: 15px 0 20px 0;
+  background: none;
+  border: none;
+}
+
+.styled-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  background-color: #fff;
+  color: #111;
+  text-align: left;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+/* Remove spin buttons */
+.styled-input::-webkit-outer-spin-button,
+.styled-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.styled-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Buttons */
+.styled-button {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: auto;
+  padding: 10px 20px;
+  border-radius: 2px;
+  font-size: 14px;
+  border: 1px solid #555;
+}
+.tab-button {
+  background: #e0e0e0;
+  color: #111;
+  border: 1px solid #888;
+  padding: 6px 12px;
+  margin: 8px 4px;
+  font-size: 14px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.styled-button:hover,
+.tab-button:hover {
+  background: #d0d0d0;
+}
+
+/* Active tab */
+.tab-button.active {
+  font-weight: bold;
+  background: #ccc;
+}
+
+/* Tabs container */
+.tab-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+/* Result display */
+.result-display {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 18px;
+  background-color: #eee;
+  border: 1px solid #999;
+  color: #000;
+  text-align: left;
+  margin-top: 20px;
+  white-space: pre-wrap;      /* allows wrapping for long text */
+  word-break: break-word;     /* prevents overflow from long words */
+  min-height: 40px;           /* ensures there's always space even if empty */
+}
+
+/* Responsive fix */
+@media (max-width: 480px) {
+  .calculator-container {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .styled-button,
+  .tab-button {
+    width: 100%;
+    margin: 6px 0;
+  }
+}
+
+/* Container for the steps box */
+.steps-container {
+  position: relative;
+  margin-top: 10px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Label that triggers the hover */
+.steps-label {
+  display: inline-block;
+  color: #333;
+  font-size: 14px;
+  text-decoration: underline;
+  padding: 6px 4px;
+}
+
+/* Hidden content that shows on hover */
+.steps-content {
+  display: none;
+  position: relative;
+  background-color: #f9f9f9;
+  border: 1px solid #999;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 14px;
+  color: #000;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Show steps on hover */
+.steps-container:hover .steps-content {
+  display: block;
+}
