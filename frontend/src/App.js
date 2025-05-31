@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import './App.css';
 
-function PellSolver() {
+function Solver({
+  title,
+  description,
+  endpoint,
+  buildSuccessText,
+  buildStepsText
+}) {
   const [inputN, setInputN] = useState('');
-  const [resultText, setResultText] = useState(''); // Text representation of the response (ugly)
-  const [calculationSteps, setCalculationSteps] = useState('')
+  const [resultText, setResultText] = useState('');
+  const [calculationSteps, setCalculationSteps] = useState('');
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -12,19 +18,19 @@ function PellSolver() {
     const n = parseInt(inputN);
     if (isNaN(n) || n <= 0) {
       setSuccess(false);
-      setCalculationSteps('');
       setResultText('Please enter a positive squarefree integer!');
+      setCalculationSteps('');
       return;
     }
 
+    // Tab is loading whilst the calculation takes place
     setLoading(true);
-
     setSuccess(null);
     setResultText('');
     setCalculationSteps('');
 
     try {
-      const response = await fetch('/backend/pell', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ n })
@@ -33,203 +39,108 @@ function PellSolver() {
       const data = await response.json();
       if (data.success === 'Success') {
         setSuccess(true);
-        setResultText(`Fundamental solution: (x, y)=${data.solution}`);
-        setCalculationSteps(
-          `The continued fraction representation of sqrt{n} is regular and periodic with period ${data.period} `
-          + `and is given by ${data.cont_frac}. `
-          + `Since the period is ${data.period % 2 === 1 ? 'odd' : 'even'}, the ${data.solution_index}th `
-          + `convergent ${data.solution} gives the fundamental solution.`)
+        setResultText(buildSuccessText(data));
+        setCalculationSteps(buildStepsText(data));
+      } else if (data.success === 'SuccessNoSolution') {
+        setSuccess(true);
+        setResultText('No solutions!');
+        setCalculationSteps(buildStepsText(data));
       } else if (data.success === 'NotSquarefree') {
         setSuccess(false);
-        setCalculationSteps('');
         setResultText('Please enter a positive squarefree integer!');
       } else {
         setSuccess(false);
-        setCalculationSteps('')
-        setResultText('Calculation Failed');
+        setResultText('An error occurred. Please try another');
       }
     } catch (error) {
       setSuccess(false);
-      setCalculationSteps('')
       setResultText('An error occurred. Please try another');
     } finally {
       setLoading(false);
     }
   };
 
- return (
-    <div>
-      <h2>Pell's Equation Solver</h2>
-      <p className="description-box">This applet will find the fundamental solution to the equation x² - ny² = 1
-        given an input n. Given the fundamental solution (x*, y*) and any solution (x, y), a further solution is given by
-        (x*x + ny*y, x*y + y*x). All solutions are obtained this way.
-      </p>
-      <input
-        className="styled-input"
-        type="number"
-        value={inputN}
-        onChange={e => setInputN(e.target.value)}
-        placeholder="Enter n"
-      />
-      <button className="styled-button" onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Calculating...' : 'Calculate'}
-      </button>
-      <p
-        className="result-display"
-        style={{
-          color:
-            success === null
-              ? '#333'
-              : success
-              ? '#2e7d32'
-              : '#d32f2f'
-        }}
-      >
-        {resultText}
-      </p>
-      {calculationSteps && (
-        <div className="steps-container">
-          <div className="steps-label">Show Calculation Steps</div>
-          <div className="steps-content">{calculationSteps}</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NegativePellSolver() {
-  const [inputN, setInputN] = useState('');
-  const [resultText, setResultText] = useState(''); // Text representation of the response (ugly)
-  const [calculationSteps, setCalculationSteps] = useState('')
-  const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    const n = parseInt(inputN);
-    if (isNaN(n) || n <= 0) {
-      setSuccess(false);
-      setCalculationSteps('');
-      setResultText('Please enter a positive squarefree integer!');
-      return;
-    }
-
-    setLoading(true);
-
-    setSuccess(null);
-    setResultText('');
-    setCalculationSteps('');
-
-    try {
-      const response = await fetch('/backend/negative_pell', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ n })
-      });
-
-      const data = await response.json();
-      if (data.success === 'Success') {
-        setSuccess(true);
-        setResultText(`Fundamental solution: (x, y)=${data.solution}. ` 
-          + `Auxiliary Pell solution: (x', y')=${data.aux_solution}`);
-        setCalculationSteps(
-          `The continued fraction representation of sqrt{n} is regular and periodic with period ${data.period} `
-          + `The period is odd so there is a solution, with index ${data.solution_index} .` 
-          + `The auxiliary solution has index ${data.aux_solution_index}`)
-      } else if (data.success === 'SuccessNoSolution') {
-        setSuccess(true);
-        setResultText(`No solutions!`);
-        setCalculationSteps(
-          `The continued fraction representation of sqrt{n} is regular and periodic with period ${data.period} `
-          + `The period is even so there is no solution`)
-      } else {
-        setSuccess(false);
-        setCalculationSteps('')
-        setResultText('Calculation Failed');
-      }
-    } catch (error) {
-      setSuccess(false);
-      setCalculationSteps('')
-      setResultText('An error occurred. Please try another');
-    } finally {
-      setLoading(false);
-    }
-  };
-
- return (
-    <div>
-      <h2>Negative Pell's Equation Solver</h2>
-      <p className="description-box">This applet will find the fundamental solution to the equation x² - ny² = -1
-        given an input n. Given the fundamental solution (x*, y*) and the fundamental solution (x',y') of the 
-        corresponding Pell's equation x² - ny² = 1, ... . All solutions are obtained this way.
-      </p>
-      <input
-        className="styled-input"
-        type="number"
-        value={inputN}
-        onChange={e => setInputN(e.target.value)}
-        placeholder="Enter n"
-      />
-      <button className="styled-button" onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Calculating...' : 'Calculate'}
-      </button>
-      <p
-        className="result-display"
-        style={{
-          color:
-            success === null
-              ? '#333'
-              : success
-              ? '#2e7d32'
-              : '#d32f2f'
-        }}
-      >
-        {resultText}
-      </p>
-      {calculationSteps && (
-        <div className="steps-container">
-          <div className="steps-label">Show Calculation Steps</div>
-          <div className="steps-content">{calculationSteps}</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function GeneralizedPellSolver() {
   return (
     <div>
-      <h2>Generalized Pell's Equation Solver: </h2>
-      {/* Replace with actual calculator logic */}
-      <p>Make me</p>
+      <h2>{title}</h2>
+      <p className="description-box">{description}</p>
+      <input
+        className="styled-input"
+        type="number"
+        value={inputN}
+        onChange={e => setInputN(e.target.value)}
+        placeholder="Enter n"
+      />
+      <button className="styled-button" onClick={handleSubmit} disabled={loading}>
+        {loading ? 'Calculating...' : 'Calculate'}
+      </button>
+      <p
+        className="result-display"
+        style={{ color: success === null ? '#333' : success ? '#2e7d32' : '#d32f2f' }}
+      >
+        {resultText}
+      </p>
+      {calculationSteps && (
+        <div className="steps-container">
+          <div className="steps-label">Show Calculation Steps</div>
+          <div className="steps-content">{calculationSteps}</div>
+        </div>
+      )}
     </div>
   );
 }
 
 function PellSolverApp() {
-  const [activeTab, setActiveTab] = useState('A');
+  const [activeTab, setActiveTab] = useState('Pell');
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'A':
-        return <PellSolver />;
-      case 'B':
-        return <NegativePellSolver />;
-      case 'C':
-        return <GeneralizedPellSolver />;
-      default:
-        return null;
+  const tabs = {
+    Pell: {
+      title: "Pell's Equation Solver",
+      description: `This applet finds the fundamental solution to x² - ny² = 1 given an input n.`,
+      endpoint: '/backend/pell',
+      buildSuccessText: data => `Fundamental solution: (x, y)=${data.solution}`,
+      buildStepsText: data => `Continued fraction of √sqrt{n} has period ${data.period}. Solution index: ${data.solution_index}. Representation: ${data.cont_frac}`
+    },
+    NegPell: {
+      title: "Negative Pell's Equation Solver",
+      description: `This applet finds the fundamental solution to x² - ny² = -1 if it exists.`,
+      endpoint: '/backend/negative_pell',
+      buildSuccessText: data =>
+        `Fundamental solution: (x, y)=${data.solution}. Auxiliary: (x', y')=${data.aux_solution}`,
+      buildStepsText: data =>
+        `Continued fraction of √sqrt{n} has period ${data.period}. ` +
+        `${data.success === 'SuccessNoSolution' ? 'Even period → no solution.' : 'Odd period → solution at index ' + data.solution_index}`
+    },
+    GeneralPell: {
+      title: "Generalised Pell's Equation Solver",
+      description: 'Coming soon...'
     }
   };
+
+  const tabKeys = Object.keys(tabs);
 
   return (
     <div className="calculator-container">
       <div className="tab-header">
-        <button className={`tab-button ${activeTab === 'A' ? 'active' : ''}`} onClick={() => setActiveTab('A')}>Pell's Equation Solver</button>
-        <button className={`tab-button ${activeTab === 'B' ? 'active' : ''}`} onClick={() => setActiveTab('B')}>Negative Pell's Equation Solver</button>
-        <button className={`tab-button ${activeTab === 'C' ? 'active' : ''}`} onClick={() => setActiveTab('C')}>Generalised Pell's Equation Solver</button>
+        {tabKeys.map(key => (
+          <button
+            key={key}
+            className={`tab-button ${activeTab === key ? 'active' : ''}`}
+            onClick={() => setActiveTab(key)}
+          >
+            {tabs[key].title}
+          </button>
+        ))}
       </div>
       <div className="tab-content">
-        {renderTabContent()}
+        {activeTab === 'GeneralPell' ? (
+          <div>
+            <h2>{tabs.GeneralPell.title}</h2>
+            <p>{tabs.GeneralPell.description}</p>
+          </div>
+        ) : (
+          <Solver {...tabs[activeTab]} />
+        )}
       </div>
     </div>
   );
