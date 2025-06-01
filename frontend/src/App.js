@@ -107,7 +107,7 @@ function PellSolverApp() {
   const [resetKey, setResetKey] = useState(0);
 
   const tabs = {
-    A: {
+    Pell: {
       title: "Pell's Equation Solver",
       description: `This applet finds the fundamental solution to x² - ny² = 1 given an input n.`,
       endpoint: '/backend/pell',
@@ -118,7 +118,7 @@ function PellSolverApp() {
         `Solution index: ${data.solution_index}.`
       ]
     },
-    B: {
+    NegPell: {
       title: "Negative Pell's Equation Solver",
       description: `This applet finds the fundamental solution to x² - ny² = -1 if it exists.`,
       endpoint: '/backend/negative_pell',
@@ -131,7 +131,7 @@ function PellSolverApp() {
           : `Odd period → solution at index ${data.solution_index}`
       ]
     },
-    C: {
+    GeneralPell: {
       title: "Generalised Pell's Equation Solver",
       description: 'Coming soon...'
     }
@@ -158,7 +158,7 @@ function PellSolverApp() {
         ))}
       </div>
       <div className="tab-content">
-        {activeTab === 'C' ? (
+        {activeTab === 'GeneralPell' ? (
           <div>
             <h2>{tabs.C.title}</h2>
             <p>{tabs.C.description}</p>
