@@ -118,34 +118,30 @@ h2 {
 
 /* Container for the steps box */
 .steps-container {
-  position: relative;
-  margin-top: 10px;
-  text-align: left;
-  cursor: pointer;
+  margin-top: 20px;
   width: 100%;
-}
-
-/* Label that triggers the hover */
-.steps-label {
-  display: inline-block;
-  color: #333;
-  font-size: 14px;
-  text-decoration: underline;
-  padding: 6px 4px;
-}
-
-/* Hidden content that shows on hover */
-.steps-content {
-  display: none;
-  position: relative;
+  border: 1px solid #ccc;
   background-color: #f9f9f9;
-  border: 1px solid #999;
-  padding: 10px;
-  margin-top: 6px;
+  border-radius: 4px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Label for steps */
+.steps-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Bulleted steps content */
+.steps-content {
+  padding-left: 20px; /* Ensures bullets appear inside the box */
+  margin: 0;
   font-size: 14px;
   color: #000;
-  white-space: pre-wrap;
-  word-break: break-word;
+  list-style-type: disc;
 }
 
 /* Show steps on hover */

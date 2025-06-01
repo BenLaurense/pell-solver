@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function Solver({
@@ -6,28 +6,36 @@ function Solver({
   description,
   endpoint,
   buildSuccessText,
-  buildStepsText
+  buildStepsText,
+  resetSignal
 }) {
   const [inputN, setInputN] = useState('');
   const [resultText, setResultText] = useState('');
-  const [calculationSteps, setCalculationSteps] = useState('');
+  const [calculationSteps, setCalculationSteps] = useState([]);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setInputN('');
+    setResultText('');
+    setCalculationSteps([]);
+    setSuccess(null);
+    setLoading(false);
+  }, [resetSignal]);
 
   const handleSubmit = async () => {
     const n = parseInt(inputN);
     if (isNaN(n) || n <= 0) {
       setSuccess(false);
       setResultText('Please enter a positive squarefree integer!');
-      setCalculationSteps('');
+      setCalculationSteps([]);
       return;
     }
 
-    // Tab is loading whilst the calculation takes place
     setLoading(true);
     setSuccess(null);
     setResultText('');
-    setCalculationSteps('');
+    setCalculationSteps([]);
 
     try {
       const response = await fetch(endpoint, {
@@ -50,7 +58,7 @@ function Solver({
         setResultText('Please enter a positive squarefree integer!');
       } else {
         setSuccess(false);
-        setResultText('An error occurred. Please try another');
+        setResultText('Calculation Failed');
       }
     } catch (error) {
       setSuccess(false);
@@ -80,10 +88,14 @@ function Solver({
       >
         {resultText}
       </p>
-      {calculationSteps && (
+      {calculationSteps.length > 0 && (
         <div className="steps-container">
-          <div className="steps-label">Show Calculation Steps</div>
-          <div className="steps-content">{calculationSteps}</div>
+          <div className="steps-label">Calculation Steps:</div>
+          <ul className="steps-content">
+            {calculationSteps.map((step, index) => (
+              <li key={index}>{step}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
@@ -91,33 +103,46 @@ function Solver({
 }
 
 function PellSolverApp() {
-  const [activeTab, setActiveTab] = useState('Pell');
+  const [activeTab, setActiveTab] = useState('A');
+  const [resetKey, setResetKey] = useState(0);
 
   const tabs = {
-    Pell: {
+    A: {
       title: "Pell's Equation Solver",
       description: `This applet finds the fundamental solution to x² - ny² = 1 given an input n.`,
       endpoint: '/backend/pell',
       buildSuccessText: data => `Fundamental solution: (x, y)=${data.solution}`,
-      buildStepsText: data => `Continued fraction of √sqrt{n} has period ${data.period}. Solution index: ${data.solution_index}. Representation: ${data.cont_frac}`
+      buildStepsText: data => [
+        `Continued fraction of √n has period ${data.period}.`,
+        `Representation: ${data.cont_frac}.`,
+        `Solution index: ${data.solution_index}.`
+      ]
     },
-    NegPell: {
+    B: {
       title: "Negative Pell's Equation Solver",
       description: `This applet finds the fundamental solution to x² - ny² = -1 if it exists.`,
       endpoint: '/backend/negative_pell',
       buildSuccessText: data =>
         `Fundamental solution: (x, y)=${data.solution}. Auxiliary: (x', y')=${data.aux_solution}`,
-      buildStepsText: data =>
-        `Continued fraction of √sqrt{n} has period ${data.period}. ` +
-        `${data.success === 'SuccessNoSolution' ? 'Even period → no solution.' : 'Odd period → solution at index ' + data.solution_index}`
+      buildStepsText: data => [
+        `Continued fraction of √n has period ${data.period}.`,
+        data.success === 'SuccessNoSolution'
+          ? 'Even period → no solution.'
+          : `Odd period → solution at index ${data.solution_index}`
+      ]
     },
-    GeneralPell: {
+    C: {
       title: "Generalised Pell's Equation Solver",
       description: 'Coming soon...'
     }
   };
 
   const tabKeys = Object.keys(tabs);
+
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setResetKey(prev => prev + 1);
+  };
 
   return (
     <div className="calculator-container">
@@ -126,20 +151,20 @@ function PellSolverApp() {
           <button
             key={key}
             className={`tab-button ${activeTab === key ? 'active' : ''}`}
-            onClick={() => setActiveTab(key)}
+            onClick={() => handleTabChange(key)}
           >
             {tabs[key].title}
           </button>
         ))}
       </div>
       <div className="tab-content">
-        {activeTab === 'GeneralPell' ? (
+        {activeTab === 'C' ? (
           <div>
-            <h2>{tabs.GeneralPell.title}</h2>
-            <p>{tabs.GeneralPell.description}</p>
+            <h2>{tabs.C.title}</h2>
+            <p>{tabs.C.description}</p>
           </div>
         ) : (
-          <Solver {...tabs[activeTab]} />
+          <Solver {...tabs[activeTab]} resetSignal={resetKey} />
         )}
       </div>
     </div>

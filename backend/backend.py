@@ -1,15 +1,12 @@
-from flask import Flask, request, jsonify
-from enum import Enum
+from flask import Flask, send_from_directory, request, jsonify
+from success_code import SuccessCode
 from calculation import is_squarefree, clip_continued_fraction, solve_pell, solve_negative_pell
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 
-
-class SuccessCode(Enum):
-    Success = 1,
-    SuccessNoSolution = 4,
-    Error = 2,
-    NotSquarefree = 3,
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
 
 
 @app.route('/backend/pell', methods=['POST'])
@@ -92,3 +89,7 @@ def generalised_pell():
     Solve Generalised Pell's equation and store calculation steps
     '''
     raise NotImplementedError()
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
