@@ -26,9 +26,9 @@ To find integer solutions $x^2-ny^2=1$, we use the following procedure:
   - If $k$ is even, then $(x,y)=(h_{k-1},k_{k-1})$ is the fundamental
     solution.
 
-  - If $k$ is odd, then\...
+  - If $k$ is odd, then $(x,y)=(h_{2k-1},k_{2k-1})$ is the fundamental
+    solution.
 
-- Once the fundamental solution $(x_*, y_*)$ is known, all other
-  solutions can be obtained by: $$x_i+y_i\sqrt{n} = (x_*+y_*\sqrt{n})^i$$
-  Which, after some algebra, yields a recurrence:
-  $$x_{i+1}=x_*x_i+ny_*y_i,\quad y_{i+1}=x_*y_i+y_*x_i$$
+- Once the fundamental solution $(x, y)$ is known, all other
+  solutions can be obtained by: $$x_i+y_i\sqrt{n}=(x+y\sqrt{n})^i$$
+  Which, after some algebra, yields a recurrence: $$x_{i+1}=xx_i+nyy_i, y_{i+1}=xy_i+yx_i$$
