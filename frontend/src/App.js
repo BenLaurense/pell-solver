@@ -27,7 +27,7 @@ function Solver({
     const n = parseInt(inputN);
     if (isNaN(n) || n <= 0) {
       setSuccess(false);
-      setResultText('Please enter a positive squarefree integer!');
+      setResultText('Please enter a valid positive non-square integer!');
       setCalculationSteps([]);
       return;
     }
@@ -53,9 +53,9 @@ function Solver({
         setSuccess(true);
         setResultText('No solutions!');
         setCalculationSteps(buildStepsText(data));
-      } else if (data.success === 'NotSquarefree') {
+      } else if (data.success === 'IsSquare') {
         setSuccess(false);
-        setResultText('Please enter a positive squarefree integer!');
+        setResultText('Please enter a valid positive non-square integer!');
       } else {
         setSuccess(false);
         setResultText('Calculation Failed');
@@ -109,25 +109,28 @@ function PellSolverApp() {
   const tabs = {
     Pell: {
       title: "Pell's Equation Solver",
-      description: `This applet finds the fundamental solution to x² - ny² = 1 given an input n.`,
+      description: `This applet finds the fundamental solution (x*, y*) to x² - ny² = 1 given an input n. Given a solution (x, y), another solution is given by (xx* + nyy*, xy* + yx*). All solutions are obtained this way.` ,
       endpoint: '/backend/pell',
-      buildSuccessText: data => `Fundamental solution: (x, y)=${data.solution}`,
+      buildSuccessText: data => `Trivial solution: (${data.trivial_solutions})\nFundamental solution: (${data.solutions})`,
       buildStepsText: data => [
-        `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}.`,
-        `${data.period % 2 === 0 ? 'Even' : 'Odd' } period → fundamental solution at index ${data.solution_index}.`
+        // `Trivial solution (${data.trivial_solutions}) always exists`,
+        `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}`,
+        `${data.period % 2 === 0 ? 'Even' : 'Odd' } period → fundamental solution is the index-${data.solutions_idx} convergent`,
+        `Fundamental solution is (x*, y*)=(${data.solutions})`
       ]
     },
     NegPell: {
       title: "Negative Pell's Equation Solver",
-      description: `This applet finds the fundamental solution to x² - ny² = -1 if it exists.`,
+      description: `This applet finds the fundamental solution (x*, y*) to x² - ny² = -1 if it exists.`,
       endpoint: '/backend/negative_pell',
       buildSuccessText: data =>
-        `Fundamental solution: (x, y)=${data.solution}\n Auxiliary Pell solution: (x', y')=${data.aux_solution}`,
+        `Fundamental solution: (${data.solutions})\nAuxiliary Pell solution: (${data.aux_solutions})`,
       buildStepsText: data => [
         `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}.`,
         data.success === 'SuccessNoSolution'
-          ? 'Even period → no solution.'
-          : `Odd period → fundamental solution at index ${data.solution_index}`
+          ? 'Even period → no solution'
+          : `Odd period → fundamental solution is the index-${data.solutions_idx} convergent`,
+        // `The auxiliary Pell equation x² - ${data.n}y² = 1 has fundamental solution (x', y')=(${data.aux_solutions})`
       ]
     },
     GeneralPell: {

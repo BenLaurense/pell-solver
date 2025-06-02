@@ -1,6 +1,10 @@
 import math
 
 
+def is_square(n: int) -> bool:
+    return math.isqrt(n)**2 == n
+
+
 def is_squarefree(n: int) -> bool:
     '''
     Check if an integer is squarefree (dumb implementation for now)

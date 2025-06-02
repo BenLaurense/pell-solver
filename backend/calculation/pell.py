@@ -1,4 +1,20 @@
 import math
+from dataclasses import dataclass
+
+
+solution_type = list[tuple[int, int]] | None
+
+@dataclass
+class PellResponse:
+    """Represents the calculation steps and solution of a Pell-type equation"""
+    n: int
+    cont_frac: list[int]    # Continued fraction rep
+    period: int # Period of the continued fraction rep
+    solutions_idx: list[int] | None # Indexes of the fundamental solution(s) amongst convergents
+    solutions: solution_type    # Fundamental solution(s)
+    trivial_solutions: solution_type # Additional trivial solution(s)
+    aux_solutions_idx: list[int] | None = None  # Indexes of the auxiliary solutions of the associated Pell equation
+    aux_solutions: solution_type = None # Auxiliary solutions of the associated Pell equation
 
 
 def regular_cont_fraction(n: int) -> list[int]:
@@ -19,7 +35,7 @@ def regular_cont_fraction(n: int) -> list[int]:
     return l
 
 
-def solve_pell(n: int) -> dict:
+def solve_pell(n: int) -> PellResponse:
     '''
     Given an integer n, finds the fundamental solution of Pell's equation 
     using the continued fraction method.
@@ -35,22 +51,24 @@ def solve_pell(n: int) -> dict:
 
     h_pprev, h_prev = 0, 1
     k_pprev, k_prev = 1, 0
-    h, k = None, None
+    h, k = 0, 0
     for j in range(1, idx + 1):
         h = l[j - 1] * h_prev + h_pprev
         k = l[j - 1] * k_prev + k_pprev
         # print(j, h, k, h**2 - n*k**2)
         h_pprev, h_prev = h_prev, h
         k_pprev, k_prev = k_prev, k
-    return {
-        'cont_frac': l,
-        'period': period,
-        'solution_index': idx,
-        'solution': (h, k)
-    }
+    
+    return PellResponse(
+        n=n, 
+        cont_frac=l,
+        period=period,
+        solutions_idx=[idx],
+        solutions=[(h, k)],
+        trivial_solutions=[(1, 0)])
 
 
-def solve_negative_pell(n: int) -> dict:
+def solve_negative_pell(n: int) -> PellResponse:
     '''
     Given an integer n, finds the fundamental solution of the Negative Pell's equation 
     using the continued fraction method. Also returns the fundamental solution of 
@@ -61,22 +79,21 @@ def solve_negative_pell(n: int) -> dict:
     period = len(l) - 1  # Integer part not counted
 
     if not period % 2:
-        return {
-            'cont_frac': l,
-            'period': period,
-            'solution_index': None,
-            'aux_solution_index': None,
-            'solution': None,
-            'aux_solution': None
-        }
+        return PellResponse(
+            n=n,
+            cont_frac=l,
+            period=period,
+            solutions_idx=None,
+            solutions=None,
+            trivial_solutions=None)
     p_idx = 2 * period
     n_idx = period
     l += l[1:]  # Make long enough
 
     h_pprev, h_prev = 0, 1
     k_pprev, k_prev = 1, 0
-    h, k = None, None
-    ns = None
+    h, k = 0, 0
+    ns = (0, 0)
     for j in range(1, p_idx + 1):
         h = l[j - 1] * h_prev + h_pprev
         k = l[j - 1] * k_prev + k_pprev
@@ -85,14 +102,15 @@ def solve_negative_pell(n: int) -> dict:
             ns = (h, k)
         h_pprev, h_prev = h_prev, h
         k_pprev, k_prev = k_prev, k
-    return {
-        'cont_frac': l,
-        'period': period,
-        'solution_index': n_idx,
-        'aux_solution_index': p_idx,
-        'solution': ns,
-        'aux_solution': (h, k)
-    }
+    return PellResponse(
+        n=n,
+        cont_frac=l,
+        period=period,
+        solutions_idx=[n_idx],
+        solutions=[ns],
+        trivial_solutions=None,
+        aux_solutions_idx=[p_idx],
+        aux_solutions=[(h, k)])
 
 
 def pell_next_solution(n: int, fundamental_solution: tuple[int, int], current_solution: tuple[int, int]) -> tuple[

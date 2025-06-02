@@ -1,13 +1,15 @@
 from flask import Flask, send_from_directory, request, jsonify
-from backend.calculation import is_squarefree, clip_continued_fraction, solve_pell, solve_negative_pell
+from backend.calculation import is_square, clip_continued_fraction, solve_pell, solve_negative_pell
 from enum import Enum
+from dataclasses import asdict
+
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 
 
 @app.route('/')
 def serve_index():
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory(app.static_folder, 'index.html') # type: ignore
 
 
 @app.route('/backend/pell', methods=['POST'])
@@ -19,31 +21,25 @@ def pell():
     app.logger.info(f'Call to /backend/pell with input={req}')
 
     n = int(req['n'])
-    if not is_squarefree(n):
+    if is_square(n):
         return jsonify({
             'n': n,
-            'success': SuccessCode.NotSquarefree.name,
-            'solution': None,
+            'success': SuccessCode.IsSquare.name
         })
-
+    
     try:
         result = solve_pell(n)
         app.logger.info(f'result: {result}')
 
-        return jsonify({
-            'n': n,
-            'success': SuccessCode.Success.name,
-            'solution': result['solution'],
-            'period': result['period'],
-            'solution_index': result['solution_index'],
-            'cont_frac': clip_continued_fraction(result['cont_frac'])
-        })
+        result_dict = asdict(result)
+        result_dict['success'] = SuccessCode.Success.name
+        result_dict['cont_frac'] = clip_continued_fraction(result_dict['cont_frac'])
+        return jsonify(result_dict)
 
     except Exception as e:
         return jsonify({
             'n': n,
             'success': SuccessCode.Error.name,
-            'solution': None,
             'error': str(e)
         })
 
@@ -57,38 +53,28 @@ def negative_pell():
     app.logger.info(f'Call to /backend/negative_pell with input={req}')
 
     n = int(req['n'])
-    if not is_squarefree(n):
+    if is_square(n):
         return jsonify({
             'n': n,
-            'success': SuccessCode.NotSquarefree.name,
-            'solution': None,
+            'success': SuccessCode.IsSquare.name
         })
 
     try:
         result = solve_negative_pell(n)
         app.logger.info(f'result: {result}')
-        if not result['solution']:
-            return jsonify({
-                'n': n,
-                'success': SuccessCode.SuccessNoSolution.name,
-                'result': None,
-            })
-        return jsonify({
-            'n': n,
-            'success': SuccessCode.Success.name,
-            'solution': result['solution'],
-            'aux_solution': result['aux_solution'],
-            'period': result['period'],
-            'solution_index': result['solution_index'],
-            'aux_solution_index': result['aux_solution_index'],
-            'cont_frac': clip_continued_fraction(result['cont_frac'])
-        })
+
+        result_dict = asdict(result)
+        if result.solutions:
+            result_dict['success'] = SuccessCode.Success.name
+        else:
+            result_dict['success'] = SuccessCode.SuccessNoSolution.name
+        result_dict['cont_frac'] = clip_continued_fraction(result_dict['cont_frac'])
+        return jsonify(result_dict)
 
     except Exception as e:
         return jsonify({
             'n': n,
             'success': SuccessCode.Error.name,
-            'result': None,
             'error': str(e)
         })
 
@@ -105,7 +91,7 @@ class SuccessCode(Enum):
     Success = 1,
     SuccessNoSolution = 4,
     Error = 2,
-    NotSquarefree = 3
+    IsSquare = 3
 
 
 if __name__ == '__main__':
