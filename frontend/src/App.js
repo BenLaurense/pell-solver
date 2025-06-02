@@ -134,7 +134,7 @@ function PellSolverApp() {
         data.success === 'SuccessNoSolution'
           ? 'Even period → no solution'
           : `Odd period → fundamental solution is the index-${data.solutions_idx} convergent`,
-        // `The auxiliary Pell equation x² - ${data.n}y² = 1 has fundamental solution (x', y')=(${data.aux_solutions})`
+        `The auxiliary Pell equation x² - ${data.n}y² = 1 has fundamental solution (x', y')=(${data.aux_solutions})`
         // `Fundamental solution is (x*, y*)=(${data.solutions})`
       ]
     },
