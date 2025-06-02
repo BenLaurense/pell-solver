@@ -50,7 +50,7 @@ def solve_pell(n: int) -> dict:
     }
 
 
-def solve_negative_pell(n: int) -> dict | None:
+def solve_negative_pell(n: int) -> dict:
     '''
     Given an integer n, finds the fundamental solution of the Negative Pell's equation 
     using the continued fraction method. Also returns the fundamental solution of 

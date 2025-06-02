@@ -1,5 +1,5 @@
 from flask import Flask, send_from_directory, request, jsonify
-from calculation import is_squarefree, clip_continued_fraction, solve_pell, solve_negative_pell
+from backend.calculation import is_squarefree, clip_continued_fraction, solve_pell, solve_negative_pell
 from enum import Enum
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
@@ -67,7 +67,7 @@ def negative_pell():
     try:
         result = solve_negative_pell(n)
         app.logger.info(f'result: {result}')
-        if not result.solution:
+        if not result['solution']:
             return jsonify({
                 'n': n,
                 'success': SuccessCode.SuccessNoSolution.name,
