@@ -103,7 +103,7 @@ function Solver({
 }
 
 function PellSolverApp() {
-  const [activeTab, setActiveTab] = useState('A');
+  const [activeTab, setActiveTab] = useState('Pell');
   const [resetKey, setResetKey] = useState(0);
 
   const tabs = {
@@ -124,7 +124,7 @@ function PellSolverApp() {
       description: `This applet finds the fundamental solution (x*, y*) to x² - ny² = -1 if it exists.`,
       endpoint: '/backend/negative_pell',
       buildSuccessText: data =>
-        `Fundamental solution: (${data.solutions})\nAuxiliary Pell solution: (${data.aux_solutions})`,
+        `Fundamental solution: (${data.solutions})`,
       buildStepsText: data => [
         `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}.`,
         data.success === 'SuccessNoSolution'
