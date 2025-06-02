@@ -5,7 +5,8 @@ RUN npm install
 RUN npm run build
 
 FROM python:3.11-slim
-ENV PYTHONPATH="${PYTHONPATH}:/app/backend" # Needed?
+# Needed?
+ENV PYTHONPATH="${PYTHONPATH}:/app/backend"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
