@@ -4,6 +4,7 @@ from enum import Enum
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 
+
 @app.route('/')
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
@@ -20,29 +21,33 @@ def pell():
     n = int(req['n'])
     if not is_squarefree(n):
         return jsonify({
-        'success': SuccessCode.NotSquarefree.name, 
-        'solution': None,
+            'n': n,
+            'success': SuccessCode.NotSquarefree.name,
+            'solution': None,
         })
-    
+
     try:
         result = solve_pell(n)
         app.logger.info(f'result: {result}')
 
         return jsonify({
-            'success': SuccessCode.Success.name, 
+            'n': n,
+            'success': SuccessCode.Success.name,
             'solution': result['solution'],
             'period': result['period'],
             'solution_index': result['solution_index'],
             'cont_frac': clip_continued_fraction(result['cont_frac'])
-            })
+        })
 
     except Exception as e:
         return jsonify({
-            'success': SuccessCode.Error.name, 
+            'n': n,
+            'success': SuccessCode.Error.name,
             'solution': None,
             'error': str(e)
-            })
-    
+        })
+
+
 @app.route('/backend/negative_pell', methods=['POST'])
 def negative_pell():
     '''
@@ -54,34 +59,39 @@ def negative_pell():
     n = int(req['n'])
     if not is_squarefree(n):
         return jsonify({
-        'success': SuccessCode.NotSquarefree.name, 
-        'solution': None,
+            'n': n,
+            'success': SuccessCode.NotSquarefree.name,
+            'solution': None,
         })
-    
+
     try:
         result = solve_negative_pell(n)
         app.logger.info(f'result: {result}')
-        if not result:
+        if not result.solution:
             return jsonify({
-            'success': SuccessCode.SuccessNoSolution.name, 
-            'result': None,
+                'n': n,
+                'success': SuccessCode.SuccessNoSolution.name,
+                'result': None,
             })
         return jsonify({
-            'success': SuccessCode.Success.name, 
+            'n': n,
+            'success': SuccessCode.Success.name,
             'solution': result['solution'],
             'aux_solution': result['aux_solution'],
             'period': result['period'],
             'solution_index': result['solution_index'],
             'aux_solution_index': result['aux_solution_index'],
             'cont_frac': clip_continued_fraction(result['cont_frac'])
-            })
-    
+        })
+
     except Exception as e:
         return jsonify({
-            'success': SuccessCode.Error.name, 
+            'n': n,
+            'success': SuccessCode.Error.name,
             'result': None,
             'error': str(e)
-            })
+        })
+
 
 @app.route('/backend/generalised_pell', methods=['POST'])
 def generalised_pell():
@@ -90,11 +100,13 @@ def generalised_pell():
     '''
     raise NotImplementedError()
 
+
 class SuccessCode(Enum):
     Success = 1,
     SuccessNoSolution = 4,
     Error = 2,
     NotSquarefree = 3
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)

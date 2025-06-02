@@ -6,7 +6,7 @@ def is_squarefree(n: int) -> bool:
     Check if an integer is squarefree (dumb implementation for now)
     '''
     for t in range(2, math.floor(math.sqrt(n)) + 1):
-        if n % t**2 == 0:
+        if n % t ** 2 == 0:
             return False
     return True
 

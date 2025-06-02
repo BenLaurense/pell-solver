@@ -113,9 +113,8 @@ function PellSolverApp() {
       endpoint: '/backend/pell',
       buildSuccessText: data => `Fundamental solution: (x, y)=${data.solution}`,
       buildStepsText: data => [
-        `Continued fraction of √n has period ${data.period}.`,
-        `Representation: ${data.cont_frac}.`,
-        `Solution index: ${data.solution_index}.`
+        `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}.`,
+        `${data.period % 2 === 0 ? 'Even' : 'Odd' } period → fundamental solution at index ${data.solution_index}.`
       ]
     },
     NegPell: {
@@ -123,12 +122,12 @@ function PellSolverApp() {
       description: `This applet finds the fundamental solution to x² - ny² = -1 if it exists.`,
       endpoint: '/backend/negative_pell',
       buildSuccessText: data =>
-        `Fundamental solution: (x, y)=${data.solution}. Auxiliary: (x', y')=${data.aux_solution}`,
+        `Fundamental solution: (x, y)=${data.solution}\n Auxiliary Pell solution: (x', y')=${data.aux_solution}`,
       buildStepsText: data => [
-        `Continued fraction of √n has period ${data.period}.`,
+        `Continued fraction of √${data.n} is given by ${data.cont_frac} and has period ${data.period}.`,
         data.success === 'SuccessNoSolution'
           ? 'Even period → no solution.'
-          : `Odd period → solution at index ${data.solution_index}`
+          : `Odd period → fundamental solution at index ${data.solution_index}`
       ]
     },
     GeneralPell: {
@@ -160,8 +159,8 @@ function PellSolverApp() {
       <div className="tab-content">
         {activeTab === 'GeneralPell' ? (
           <div>
-            <h2>{tabs.C.title}</h2>
-            <p>{tabs.C.description}</p>
+            <h2>{tabs.GeneralPell.title}</h2>
+            <p>{tabs.GeneralPell.description}</p>
           </div>
         ) : (
           <Solver {...tabs[activeTab]} resetSignal={resetKey} />

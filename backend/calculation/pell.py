@@ -9,7 +9,7 @@ def regular_cont_fraction(n: int) -> list[int]:
     '''
     i = math.sqrt(n)
     a = math.floor(i)
-    
+
     l = [a]
     target = 2 * a
     while a != target:
@@ -26,19 +26,19 @@ def solve_pell(n: int) -> dict:
     Will throw if n is not squarefree positive
     '''
     l = regular_cont_fraction(n)
-    period = len(l) - 1 # Integer part not counted
+    period = len(l) - 1  # Integer part not counted
 
     idx = period
     if period % 2:
-        idx = 2*period
-        l += l[1:] # Make long enough
+        idx = 2 * period
+        l += l[1:]  # Make long enough
 
     h_pprev, h_prev = 0, 1
     k_pprev, k_prev = 1, 0
     h, k = None, None
     for j in range(1, idx + 1):
-        h = l[j - 1]*h_prev + h_pprev
-        k = l[j - 1]*k_prev + k_pprev
+        h = l[j - 1] * h_prev + h_pprev
+        k = l[j - 1] * k_prev + k_pprev
         # print(j, h, k, h**2 - n*k**2)
         h_pprev, h_prev = h_prev, h
         k_pprev, k_prev = k_prev, k
@@ -58,21 +58,28 @@ def solve_negative_pell(n: int) -> dict | None:
     Will throw if n is not squarefree positive.
     '''
     l = regular_cont_fraction(n)
-    period = len(l) - 1 # Integer part not counted
-    
+    period = len(l) - 1  # Integer part not counted
+
     if not period % 2:
-        return None
-    p_idx = 2*period
+        return {
+            'cont_frac': l,
+            'period': period,
+            'solution_index': None,
+            'aux_solution_index': None,
+            'solution': None,
+            'aux_solution': None
+        }
+    p_idx = 2 * period
     n_idx = period
-    l += l[1:] # Make long enough
+    l += l[1:]  # Make long enough
 
     h_pprev, h_prev = 0, 1
     k_pprev, k_prev = 1, 0
     h, k = None, None
     ns = None
     for j in range(1, p_idx + 1):
-        h = l[j - 1]*h_prev + h_pprev
-        k = l[j - 1]*k_prev + k_pprev
+        h = l[j - 1] * h_prev + h_pprev
+        k = l[j - 1] * k_prev + k_pprev
         # print(j, h, k, h**2 - n*k**2)
         if j == n_idx:
             ns = (h, k)
@@ -88,11 +95,11 @@ def solve_negative_pell(n: int) -> dict | None:
     }
 
 
-def pell_next_solution(n: int, fundamental_solution: tuple[int, int], current_solution: tuple[int, int]) -> tuple[int, int]:
+def pell_next_solution(n: int, fundamental_solution: tuple[int, int], current_solution: tuple[int, int]) -> tuple[
+    int, int]:
     '''
     Given a solution of Pell's equation and the fundamental solution, computes the next solution
     '''
     x = fundamental_solution[0] * current_solution[0] + n * fundamental_solution[1] * current_solution[1]
     y = fundamental_solution[1] * current_solution[0] + fundamental_solution[0] * current_solution[1]
     return (x, y)
-    
