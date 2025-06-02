@@ -1,6 +1,6 @@
 from flask import Flask, send_from_directory, request, jsonify
-from success_code import SuccessCode
 from calculation import is_squarefree, clip_continued_fraction, solve_pell, solve_negative_pell
+from enum import Enum
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 
@@ -90,6 +90,11 @@ def generalised_pell():
     '''
     raise NotImplementedError()
 
+class SuccessCode(Enum):
+    Success = 1,
+    SuccessNoSolution = 4,
+    Error = 2,
+    NotSquarefree = 3
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
